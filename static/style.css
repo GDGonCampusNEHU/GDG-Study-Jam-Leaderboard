@@ -75,7 +75,7 @@ main {
 
 #refresh-btn {
     background-color: #fff;
-    border: 1px solid #dadce0;
+    border: 1px solid #1954ca;
     border-radius: 24px;
     padding: 0.5rem 1.25rem;
     cursor: pointer;
@@ -85,7 +85,7 @@ main {
     align-items: center;
     gap: 0.5rem;
     transition: background-color 0.3s, box-shadow 0.3s;
-    color: #1a73e8;
+    color: #0f6be4;
 }
 
 #refresh-btn:hover {
@@ -136,7 +136,7 @@ main {
     justify-content: center;
     align-items: center;
     height: 110px;
-    margin-top: 20px;
+    margin-top: 30px;
 }
 
 .progress-circle {
