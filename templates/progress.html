@@ -143,6 +143,7 @@
         .modal-content {
             background-color: white; padding: 30px; border-radius: 8px;
             text-align: center; position: relative; max-width: 400px;
+            width: 90%; /* Ensure modal is not too wide on mobile */
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             animation: scaleUp 0.3s ease-out;
         }
@@ -180,6 +181,82 @@
         .social-links a:hover {
             opacity: 0.7;
             text-decoration: underline;
+        }
+        
+        /* --- RESPONSIVE STYLES --- */
+
+        /* For Tablets (up to 1024px) */
+        @media (max-width: 1024px) {
+            .container {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+        }
+
+        /* For Mobile Phones (up to 768px) */
+        @media (max-width: 768px) {
+            .controls-bar {
+                /* Stack the search bar and export button */
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+
+            /* Hide the table header, we will use data-labels instead */
+            #progress-table thead {
+                display: none;
+            }
+            
+            /* Make each row behave like a card */
+            #progress-table tr {
+                display: block;
+                margin-bottom: 20px;
+                border: 1px solid #e0e0e0;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+
+            #progress-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 15px;
+                text-align: right;
+                border-bottom: 1px solid #f0f0f0;
+                white-space: normal; /* Allow text to wrap */
+            }
+
+            #progress-table tr td:last-child {
+                border-bottom: none; /* Remove border from the last item in a card */
+            }
+
+            /* Add the label before the cell content */
+            #progress-table td::before {
+                content: attr(data-label);
+                font-weight: 500;
+                text-align: left;
+                padding-right: 15px;
+                color: #5f6368;
+            }
+
+            /* Special styling for the main "Name" cell to act as a card header */
+            #progress-table td.participant-name {
+                justify-content: flex-start;
+                font-size: 16px;
+                background-color: #f8f9fa;
+                border-top-left-radius: 8px;
+                border-top-right-radius: 8px;
+            }
+            
+            /* We don't need a "Name:" label for the header cell */
+            #progress-table td.participant-name::before {
+                display: none;
+            }
+
+            /* Center align the status checkmarks */
+             #progress-table .status-cell {
+                justify-content: flex-end;
+            }
         }
     </style>
 </head>
@@ -313,21 +390,24 @@
                     const isTopRanker = p.rank <= 3 ? 'top-ranker' : '';
 
                     let row = `<tr data-name="${p.name.toLowerCase()}" class="${isTopRanker}" data-participant='${JSON.stringify(p)}'>
-                                        <td class="rank-cell">${rankDisplay}</td>
-                                        <td class="participant-name">
-                                            <div class="avatar" style="background-color: ${color};">${p.initials}</div>
-                                            ${p.name}
-                                        </td>
-                                        <td class="badge-count">
+                                    <td class="participant-name" data-label="Name">
+                                        <div class="avatar" style="background-color: ${color};">${p.initials}</div>
+                                        ${p.name}
+                                    </td>
+                                     <td class="rank-cell" data-label="Rank">${rankDisplay}</td>
+                                    <td class="badge-count" data-label="Badge Count">
+                                        <div>
                                             <div class="count-chip">${p.badge_count} / ${labs.length}</div>
                                             <div class="progress-bar-container">
                                                 <div class="progress-bar" style="width: ${p.completion_percentage}%;"></div>
                                             </div>
-                                        </td>`;
+                                        </div>
+                                    </td>`;
                     
                     labs.forEach(lab => {
                         const completed = p.name_of_completed_labs.includes(lab);
-                        row += `<td class="status-cell">${completed ? check_mark : ''}</td>`;
+                        // Use a dash for not completed for better mobile view
+                        row += `<td class="status-cell" data-label="${lab}">${completed ? check_mark : '—'}</td>`;
                     });
 
                     row += '</tr>';

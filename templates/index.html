@@ -57,6 +57,64 @@
             text-decoration: underline;
         }
 
+        /* --- RESPONSIVE STYLES --- */
+        /* These styles will apply on screens of different sizes */
+
+        /* For Tablets (e.g., screen width up to 1024px) */
+        @media (max-width: 1024px) {
+            .container {
+                /* Add some horizontal padding for smaller screens */
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            .stats-grid {
+                /* Change from a 4-column layout to a 2-column layout */
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .charts-grid {
+                /* Change from a 2-column layout to a 1-column layout */
+                grid-template-columns: repeat(1, 1fr);
+            }
+        }
+
+        /* For Mobile Phones (e.g., screen width up to 768px) */
+        @media (max-width: 768px) {
+            header {
+                /* Stack the logo and navigation links vertically */
+                flex-direction: column;
+                align-items: center;
+                gap: 15px; /* Add space between logo and nav */
+            }
+
+            .main-header {
+                /* Stack the title and refresh button vertically */
+                flex-direction: column;
+                align-items: flex-start; /* Align items to the start */
+                gap: 20px;
+            }
+
+            .title-section div {
+                /* Ensure title and subtitle are aligned left */
+                text-align: left;
+            }
+            
+            h1 {
+                font-size: 1.6rem; /* Slightly reduce main heading size */
+            }
+
+            .stats-grid {
+                /* Stack all stat cards in a single column */
+                grid-template-columns: repeat(1, 1fr);
+            }
+
+            .chart-container {
+                /* Give charts a fixed height on mobile to prevent them from being too squished */
+                min-height: 300px;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -66,8 +124,8 @@
                 <img src="{{url_for('static',filename='logo.png')}}" alt="Google Developer Group">
             </div>
             <nav>
-                <a href="/" class="active">Home</a>
-                <a href="/progress">Progress</a>
+                <a href="/dashboard" class="active">DashBoard</a>
+                <a href="/">Progress</a>
                 <a href="#">About</a>
             </nav>
         </header>
