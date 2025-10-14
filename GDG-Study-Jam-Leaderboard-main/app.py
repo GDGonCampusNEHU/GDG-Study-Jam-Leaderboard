@@ -132,6 +132,7 @@ def progress():
 @app.route('/api/home-data')
 def get_stats():
     """Provides statistics for the home page."""
+    
     participant_data = get_participant_data()
     total_participants = len(participant_data)
 
