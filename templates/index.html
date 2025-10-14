@@ -29,6 +29,34 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* --- FOOTER STYLES (MODIFIED FOR SMALLER SIZE) --- */
+        footer {
+            text-align: center;
+            padding: 15px 0; /* Reduced padding from 25px */
+            margin-top: auto;
+            border-top: 1px solid #e0e0e0;
+            color: #5f6368;
+            font-size: 0.85rem; /* Reduced font size from 0.9rem */
+        }
+
+        .social-links {
+            margin-top: 5px; /* Reduced margin from 8px */
+        }
+
+        .social-links a {
+            color: #4285F4;
+            text-decoration: none;
+            margin: 0 10px; /* Slightly reduced horizontal margin */
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .social-links a:hover {
+            opacity: 0.7;
+            text-decoration: underline;
+        }
+
     </style>
 </head>
 <body>
@@ -108,6 +136,14 @@
                 </div>
             </section>
         </main>
+
+        <footer>
+            <p>Developed by Soumojit Bhuin</p>
+            <div class="social-links">
+                <a href="https://github.com/SoumojitBhuin" target="_blank" rel="noopener noreferrer">GitHub</a>
+                <a href="https://www.linkedin.com/in/soumojit-bhuin-313328345/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            </div>
+        </footer>
     </div>
 
     <script>
@@ -117,15 +153,14 @@
             const contentSections = document.querySelectorAll('.stats-grid, .charts-grid');
             let completionRateChart, popularityChart;
 
-            // --- ANIMATION CHANGE 1: Changed easing to 'easeOutBounce' for a new effect ---
             const staggeredAnimation = {
-                duration: 1200, // Increased duration for a smoother bounce
-                easing: 'easeOutBounce', // Changed from 'easeOutCirc'
+                duration: 1200,
+                easing: 'easeOutBounce',
                 delay: (context) => {
                     if (context.type !== 'data' || context.mode !== 'default') {
                         return 0;
                     }
-                    return context.dataIndex * 100; // 100ms delay between bars
+                    return context.dataIndex * 100;
                 },
             };
 
@@ -203,17 +238,14 @@
                             y: { beginAtZero: true, title: { display: true, text: 'Number of Completions' } },
                             x: { title: { display: true, text: 'Lab Number' } }
                         },
-                        // --- ANIMATION CHANGE 2: Added a staggered "grow and fade" animation ---
                         animation: {
-                            ...disabledAnimation, // Disable default animations
-                            // Animate the Y-axis (height of the bars)
+                            ...disabledAnimation,
                             y: {
                                 duration: 1000,
                                 easing: 'easeOutCirc',
-                                from: (ctx) => ctx.chart.scales.y.getPixelForValue(0), // Start from the bottom
-                                delay: (context) => context.dataIndex * 50, // Staggered delay
+                                from: (ctx) => ctx.chart.scales.y.getPixelForValue(0),
+                                delay: (context) => context.dataIndex * 50,
                             },
-                            // Also animate the opacity for a fade-in effect
                             opacity: {
                                 duration: 1000,
                                 from: 0.1,
@@ -243,11 +275,10 @@
                         maintainAspectRatio: false,
                         plugins: { legend: { display: false } },
                         scales: { x: { beginAtZero: true } },
-                        // --- Using the new "bounce" animation defined above ---
                         animation: {
                             ...disabledAnimation,
                             x: {
-                                ...staggeredAnimation, // This now uses 'easeOutBounce'
+                                ...staggeredAnimation,
                                 from: (ctx) => ctx.chart.scales.x.getPixelForValue(0)
                             }
                         }

@@ -79,7 +79,7 @@
             color: white;
             font-weight: 500;
             font-size: 14px;
-            margin-top: 0; /* <-- THE FIX: This overrides the margin from style.css */
+            margin-top: 0;
         }
         #progress-table .badge-count {
             min-width: 150px;
@@ -119,10 +119,15 @@
             border-radius: 50%;
             background-color: #e6f4ea;
         }
-        #progress-table .check-mark-icon svg {
-            width: 16px;
-            height: 16px;
-            stroke: #34a853;
+        #progress-table .check-mark-icon {
+            display: inline-flex; /* Changed from inline-block */
+            justify-content: center; /* Added for horizontal centering */
+            align-items: center; /* Added for vertical centering */
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #e6f4ea;
+            stroke: #34A853;
         }
         #progress-table tbody tr.top-ranker {
             cursor: pointer;
@@ -152,6 +157,30 @@
         .modal-content p { font-size: 16px; color: #5f6368; margin: 10px 0; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes scaleUp { from { transform: scale(0.9); } to { transform: scale(1); } }
+
+        /* --- NEW FOOTER STYLES --- */
+        footer {
+            text-align: center;
+            padding: 15px 0;
+            margin-top: auto;
+            border-top: 1px solid #e0e0e0;
+            color: #5f6368;
+            font-size: 0.85rem;
+        }
+        .social-links {
+            margin-top: 5px;
+        }
+        .social-links a {
+            color: #4285F4;
+            text-decoration: none;
+            margin: 0 10px;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+        .social-links a:hover {
+            opacity: 0.7;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -176,10 +205,10 @@
                         <p>GDG oc NEHU Progress Leaderboard</p>
                     </div>
                 </div>
-                 <button id="refresh-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                    <span>Refresh</span>
-                </button>
+                   <button id="refresh-btn">
+                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                       <span>Refresh</span>
+                   </button>
             </div>
             
             <div id="loader-container">
@@ -192,7 +221,7 @@
                     <input type="text" id="search-input" placeholder="Search by Name...">
                 </div>
                 <button id="export-csv">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                     Export to CSV
                 </button>
             </div>
@@ -204,13 +233,21 @@
                 </table>
             </div>
         </main>
+
+        <footer>
+            <p>Developed by Soumojit Bhuin</p>
+            <div class="social-links">
+                <a href="https://github.com/SoumojitBhuin" target="_blank" rel="noopener noreferrer">GitHub</a>
+                <a href="https://www.linkedin.com/in/soumojit-bhuin-313328345/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            </div>
+        </footer>
     </div>
 
     <div id="ranker-modal" class="modal-overlay">
         <div class="modal-content">
             <span id="modal-close-btn" class="modal-close">&times;</span>
             <div id="modal-body">
-                 </div>
+            </div>
         </div>
     </div>
 
@@ -269,7 +306,7 @@
                 headerRow += '</tr>';
                 thead.innerHTML = headerRow;
 
-                const check_mark = `<div class="check-mark-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
+                const check_mark = `<div class="check-mark-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
                 
                 participants.forEach((p, index) => {
                     const color = colors[index % colors.length];
@@ -357,7 +394,7 @@
             searchInput.addEventListener('keyup', filterTable);
             exportBtn.addEventListener('click', exportToCsv);
             
-            document.getElementById('progress-table').querySelector('tbody').addEventListener('click', (event) => {
+            document.querySelector('#progress-table tbody').addEventListener('click', (event) => {
                 const row = event.target.closest('tr.top-ranker');
                 if (row) {
                     const participantData = JSON.parse(row.dataset.participant);
@@ -379,4 +416,3 @@
     </script>
 </body>
 </html>
-
