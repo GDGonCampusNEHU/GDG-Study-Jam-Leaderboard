@@ -4,32 +4,42 @@ from supabase import create_client, Client
 from dotenv import load_dotenv
 
 app = Flask(__name__)
+
 load_dotenv()
 
 # --- Supabase Configuration ---
 supabase_url = os.getenv("SUPABASE_URL")
 supabase_key = os.getenv("SUPABASE_KEY")
 
+# Check if the credentials are provided
 if not supabase_url or not supabase_key:
     raise ValueError("Supabase URL and Key must be set in the .env file.")
 
+# Initialize the Supabase client
 supabase: Client = create_client(supabase_url, supabase_key)
 
-# --- Global Constants ---
-# Define the list of labs once to avoid repetition (DRY principle)
 LABS = [
-    "The Basics of Google Cloud Compute", "Get Started with Cloud Storage",
-    "Get Started with Pub_Sub", "Get Started with API Gateway",
-    "Get Started with Looker", "Get Started with Dataplex",
-    "Get Started with Google Workspace Tools", "App Building with AppSheet",
+    "The Basics of Google Cloud Compute",
+    "Get Started with Cloud Storage",
+    "Get Started with Pub_Sub",
+    "Get Started with API Gateway",
+    "Get Started with Looker",
+    "Get Started with Dataplex",
+    "Get Started with Google Workspace Tools",
+    "App Building with AppSheet",
     "Develop with Apps Script and AppSheet",
     "Develop GenAI Apps with Gemini and Streamlit",
-    "Build a Website on Google Cloud", "Set Up a Google Cloud Network",
+    "Build a Website on Google Cloud",
+    "Set Up a Google Cloud Network",
     "Store, Process, and Manage Data on Google Cloud - Console",
-    "Cloud Run Functions: 3 Ways", "App Engine: 3 Ways",
-    "Cloud Speech API: 3 Ways", "Analyze Speech and Language with Google APIs",
-    "Monitoring in Google Cloud", "Prompt Design in Vertex AI"
+    "Cloud Run Functions: 3 Ways",
+    "App Engine: 3 Ways",
+    "Cloud Speech API: 3 Ways",
+    "Analyze Speech and Language with Google APIs",
+    "Monitoring in Google Cloud",
+    "Prompt Design in Vertex AI"
 ]
+
 
 def get_initials(name):
     """Gets the initials from a name."""
@@ -40,51 +50,71 @@ def get_initials(name):
         return parts[0][0].upper()
     return ""
 
-def get_processed_participant_data():
-    """
-    OPTIMIZED: Fetches all participant data in a single query and processes it.
-    This is much more efficient than making multiple queries per request.
-    Returns a tuple: (list_of_participants, dict_of_lab_completion_counts)
-    """
-    # 1. Fetch all participant data in ONE go
-    try:
-        all_participants_raw = supabase.table("participants").select("*").execute().data
-    except Exception as e:
-        print(f"Error fetching data from Supabase: {e}")
-        return [], {lab: 0 for lab in LABS} # Return empty data on error
 
-    # 2. Initialize containers to hold processed data
-    processed_participants = []
-    lab_completion_counts = {lab: 0 for lab in LABS}
+def get_participant_data():
+    """Retrieves participant data"""
+    data = supabase.table("participants").select("*").execute().data
+    LAB_NAMES = [
+        "The Basics of Google Cloud Compute",
+        "Get Started with Cloud Storage",
+        "Get Started with Pub_Sub",
+        "Get Started with API Gateway",
+        "Get Started with Looker",
+        "Get Started with Dataplex",
+        "Get Started with Google Workspace Tools",
+        "App Building with AppSheet",
+        "Develop with Apps Script and AppSheet",
+        "Develop GenAI Apps with Gemini and Streamlit",
+        "Build a Website on Google Cloud",
+        "Set Up a Google Cloud Network",
+        "Store, Process, and Manage Data on Google Cloud - Console",
+        "Cloud Run Functions: 3 Ways",
+        "App Engine: 3 Ways",
+        "Cloud Speech API: 3 Ways",
+        "Analyze Speech and Language with Google APIs",
+        "Monitoring in Google Cloud",
+        "Prompt Design in Vertex AI"
+    ]
+    names_of_lab = []
+    ranking_list = []
 
-    # 3. Process the raw data in a single loop (in memory, very fast)
-    for row in all_participants_raw:
-        completed_labs_list = []
-        for lab in LABS:
+    for row in data:
+        completed = sum(1 for lab in LAB_NAMES if row.get(lab) == "Yes")
+        for lab in LAB_NAMES:
             if row.get(lab) == "Yes":
-                completed_labs_list.append(lab)
-                lab_completion_counts[lab] += 1 # Increment count for this lab
-
-        processed_participants.append({
-            "name": row.get("name", "N/A"),
-            "email": row.get("email", "N/A"),
-            "completed_labs": len(completed_labs_list),
-            "name_of_completed_labs": completed_labs_list
+                names_of_lab.append(lab)
+        ranking_list.append({
+            "name": row["name"],
+            "email": row["email"],
+            "completed": completed,
+            "name_of_lab": names_of_lab
         })
+        names_of_lab = []
 
-    # 4. Sort participants by the number of labs they completed
-    processed_participants.sort(key=lambda x: x["completed_labs"], reverse=True)
+    # Sort and assign ranks
+    ranking_list.sort(key=lambda x: x["completed"], reverse=True)
 
-    # 5. Add final derived fields like rank, initials, and percentages
-    final_participant_data = []
-    for rank, user in enumerate(processed_participants, start=1):
-        user["rank"] = rank
-        user["initials"] = get_initials(user["name"])
-        user['badge_count'] = user['completed_labs']
-        user['completion_percentage'] = round((user['completed_labs'] / len(LABS)) * 100) if LABS else 0
-        final_participant_data.append(user)
+    participant_data = []
+    for rank, user in enumerate(ranking_list, start=1):
+        participant_data.append({
+            "rank": rank,
+            "name": user["name"],
+            "initials": get_initials(user["name"]),
+            "completed_labs": user["completed"],
+            "name_of_completed_labs": user["name_of_lab"]
+        })
+    return participant_data
 
-    return final_participant_data, lab_completion_counts
+
+def labs_completion_rate():
+    """No of Completions for each lab"""
+    lab_counts = {}
+
+    for lab in LABS:
+        response = supabase.table("participants").select("*", count="exact").eq(lab, "Yes").execute()
+        lab_counts[lab] = response.count
+
+    return lab_counts
 
 
 @app.route('/')
@@ -101,48 +131,60 @@ def progress():
 
 @app.route('/api/home-data')
 def get_stats():
-    """Provides statistics for the home page using the single optimized function."""
-    # Call the efficient function ONCE to get all data
-    participant_data, badge_completion_rate = get_processed_participant_data()
-
+    """Provides statistics for the home page."""
+    participant_data = get_participant_data()
     total_participants = len(participant_data)
-    
-    # Handle case with no participants to avoid division by zero errors
-    if total_participants == 0:
-        return jsonify({
-            'total_participants': 0,
-            'completion_percentage': 0,
-            'average_progress': 0,
-            'top_performer': {'name': 'N/A', 'initials': 'N/A', 'badges': 0},
-            'badge_completion_rate': badge_completion_rate,
-            'badge_popularity': []
-        })
 
-    total_completed_all = sum(1 for p in participant_data if p["completed_labs"] == len(LABS))
-    completion_percentage = (total_completed_all / total_participants) * 100
+   
 
-    total_badges = sum(p["completed_labs"] for p in participant_data)
-    average_progress = total_badges / total_participants
+    total_completed_all = 0
+    for i in participant_data:
+        if i["completed_labs"] == 19:
+            total_completed_all += 1
 
-    # Find the top performer (list is already sorted, so it's the first one)
-    top_performer_data = participant_data[0]
-    if top_performer_data["completed_labs"] > 0:
-        top_performer = {
-            "name": top_performer_data["name"],
-            "initials": top_performer_data["initials"],
-            "badges": top_performer_data["completed_labs"]
-        }
+    if total_participants > 0:
+        completion_percentage = (total_completed_all / total_participants) * 100
     else:
+        completion_percentage = 0
+
+    print("\n", total_completed_all, completion_percentage)
+
+    total_badges = 0
+    for i in participant_data:
+        total_badges += i["completed_labs"]
+    print("\n",total_badges)
+    if total_participants > 0:
+        average_progress = total_badges / total_participants
+    else:
+        average_progress = 0
+
+    flag = 0
+    top_performer = {}
+    for i in participant_data:
+        if i["rank"] == 1 and i["completed_labs"] > 0:
+            top_performer = {"name": i["name"], "initials": i["initials"], "badges": i["completed_labs"]}
+            flag = 1
+            break
+
+    if flag != 1:
         top_performer = {"name": "N/A", "initials": "N/A", "badges": 0}
 
-    # Get top 6 popular badges
-    badge_popularity = sorted(badge_completion_rate.items(), key=lambda item: item[1], reverse=True)[:6]
+    print("\n", top_performer)
+
+    badge_completion_rate = labs_completion_rate()
+    print("\n", badge_completion_rate)
+
+    badge_popularity = sorted(badge_completion_rate.items(), key=lambda x: x[1], reverse=True)[:6]
 
     return jsonify({
         'total_participants': total_participants,
         'completion_percentage': round(completion_percentage),
         'average_progress': round(average_progress),
-        'top_performer': top_performer,
+        'top_performer': {
+            'name': top_performer['name'],
+            'initials': top_performer['initials'],
+            'badges': top_performer["badges"]
+        },
         'badge_completion_rate': badge_completion_rate,
         'badge_popularity': badge_popularity
     })
@@ -150,9 +192,14 @@ def get_stats():
 
 @app.route('/api/progress-data')
 def get_progress_data():
-    """Provides data for the progress page leaderboard using the single optimized function."""
-    participant_data, _ = get_processed_participant_data() # We don't need lab_counts here
+    """Provides data for the progress page leaderboard."""
+    participant_data = get_participant_data()
 
+    for p in participant_data:
+        p['badge_count'] = p['completed_labs']
+        p['completion_percentage'] = round((p['completed_labs'] / len(LABS)) * 100)
+
+    print(participant_data)
     return jsonify({
         'labs': LABS,
         'participants': participant_data

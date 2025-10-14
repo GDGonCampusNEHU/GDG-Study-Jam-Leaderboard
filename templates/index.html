@@ -163,37 +163,84 @@
             }
             
             function renderCompletionRateChart(completionData) {
-                const ctx = document.getElementById('completionRateChart').getContext('2d');
-                const labels = Object.keys(completionData);
-                const values = Object.values(completionData);
+    const ctx = document.getElementById('completionRateChart').getContext('2d');
 
-                if (completionRateChart) completionRateChart.destroy();
+    // These remain the same
+    const originalLabels = Object.keys(completionData); // e.g., 'The Basics of Google Cloud Compute'
+    const values = Object.values(completionData);       // e.g., 10
 
-                completionRateChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels.map((_, i) => i + 1),
-                        datasets: [{ data: values, backgroundColor: '#4285F4' }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { y: { beginAtZero: true } },
-                        // --- NEW GUARANTEED STAGGERED ANIMATION ---
-                        animation: {
-                            // First, disable the default "groups" animation
-                            ...disabledAnimation, 
-                            // Then, apply our custom animation to the 'y' property of each bar
-                            y: {
-                                ...staggeredAnimation,
-                                // Animate from the bottom of the chart
-                                from: (ctx) => ctx.chart.scales.y.getPixelForValue(0) 
-                            }
+    // Destroy the previous chart instance if it exists
+    if (completionRateChart) {
+        completionRateChart.destroy();
+    }
+
+    completionRateChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            // MODIFICATION 1: Create labels like "lab 1", "lab 2", etc. for the x-axis
+            labels: originalLabels.map((_, i) => `Lab ${i + 1}`),
+            datasets: [{
+                label: 'Completion Count', // Good practice to add a dataset label
+                data: values,
+                backgroundColor: '#4285F4',
+                borderColor: '#1a73e8',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false // Hides the legend at the top
+                },
+                // MODIFICATION 2: Customize tooltips to show the full lab name on hover
+                tooltip: {
+                    callbacks: {
+                        // This sets the title of the tooltip (e.g., "Lab 1")
+                        title: function(context) {
+                            return context[0].label;
+                        },
+                        // This sets the body of the tooltip
+                        label: function(context) {
+                            const dataIndex = context.dataIndex;
+                            const labName = originalLabels[dataIndex];
+                            const completionCount = context.parsed.y;
+                            // Return an array of strings for multi-line labels
+                            return [
+                                `Name: ${labName}`,
+                                `Completions: ${completionCount}`
+                            ];
                         }
                     }
-                });
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Completions'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Lab Number'
+                    }
+                }
             }
+            // Your animation options can remain here
+        }
+    });
+}
+
+// --- Example Usage ---
+// Your provided JSON data
+const jsonData = {'The Basics of Google Cloud Compute': 10, 'Get Started with Cloud Storage': 12, 'Get Started with Pub_Sub': 11, 'Get Started with API Gateway': 10, 'Get Started with Looker': 5, 'Get Started with Dataplex': 2, 'Get Started with Google Workspace Tools': 2, 'App Building with AppSheet': 2, 'Develop with Apps Script and AppSheet': 1, 'Develop GenAI Apps with Gemini and Streamlit': 1, 'Build a Website on Google Cloud': 2, 'Set Up a Google Cloud Network': 1, 'Store, Process, and Manage Data on Google Cloud - Console': 1, 'Cloud Run Functions: 3 Ways': 1, 'App Engine: 3 Ways': 1, 'Cloud Speech API: 3 Ways': 0, 'Analyze Speech and Language with Google APIs': 0, 'Monitoring in Google Cloud': 1, 'Prompt Design in Vertex AI': 1};
+
+// Call the function with your data
+renderCompletionRateChart(jsonData);
 
             function renderPopularityChart(popularityData) {
                 const ctx = document.getElementById('popularityChart').getContext('2d');
