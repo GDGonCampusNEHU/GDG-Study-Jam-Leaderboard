@@ -140,7 +140,6 @@ def get_stats():
 
     for participant in participant_data:
         labs_count = participant.get("completed_labs", 0)
-        print(f"This participant completed {labs_count} labs.")
         total_completed_all += labs_count
 
 
