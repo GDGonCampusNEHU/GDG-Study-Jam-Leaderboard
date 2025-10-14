@@ -118,15 +118,14 @@ def labs_completion_rate():
 
 
 @app.route('/')
-def index():
-    """Renders the home page."""
-    return render_template('index.html')
-
-
-@app.route('/progress')
 def progress():
     """Renders the progress page."""
     return render_template('progress.html')
+
+@app.route('/dashboard')
+def index():
+    """Renders the home page."""
+    return render_template('index.html')
 
 
 @app.route('/api/home-data')
