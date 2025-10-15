@@ -352,7 +352,7 @@
                 thead.innerHTML = '';
                 tbody.innerHTML = '';
 
-                let headerRow = '<tr><th class="rank-cell">Rank</th><th>Name</th><th>Badge Count</th>';
+                let headerRow = '<tr><th class="rank-cell">Name</th><th>Rank</th><th>Badge Count</th>';
                 labs.forEach(lab => headerRow += `<th>${lab}</th>`);
                 headerRow += '</tr>';
                 thead.innerHTML = headerRow;
@@ -426,7 +426,7 @@
                 }
                 const { labs, participants } = tableData;
                 let csvContent = "data:text/csv;charset=utf-8,";
-                const headers = ["Name", "Rank", "Badge Count", "Completion Percentage", ...labs.map(l => `"${l.replace(/"/g, '""')}"`)];
+                const headers = ["Rank", "Name", "Badge Count", "Completion Percentage", ...labs.map(l => `"${l.replace(/"/g, '""')}"`)];
                 csvContent += headers.join(",") + "\r\n";
                 participants.forEach(p => {
                     let row = [p.rank, `"${p.name.replace(/"/g, '""')}"`, p.badge_count, p.completion_percentage];
