@@ -20,6 +20,7 @@ header {
     padding: 1rem 0;
     background-color: #f1f3f4;
     border-bottom: 1px solid #dadce0;
+    position: relative;
 }
 
 .logo img {

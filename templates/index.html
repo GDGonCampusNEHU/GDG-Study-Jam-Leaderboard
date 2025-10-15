@@ -57,35 +57,46 @@
             padding: 20px;
         }
 
+        /* Footer Styles */
         footer {
             text-align: center;
-            padding: 25px 0;
+            padding: 20px 0;
             margin-top: auto;
             border-top: 1px solid #e0e0e0;
             color: #5f6368;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            flex-shrink: 0;
         }
-        footer .footer-content p {
-            margin-bottom: 20px;
+        .footer-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+        .footer-content p {
+            margin: 0;
         }
         .developer-profiles {
             display: flex;
             justify-content: center;
-            gap: 40px;
+            gap: 20px;
             flex-wrap: wrap;
         }
         .profile {
-            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         .profile-name {
             font-weight: 500;
             color: #202124;
-            margin-bottom: 8px;
+            margin: 0;
         }
         .social-links a {
             color: #4285F4;
             text-decoration: none;
-            margin: 0 8px;
+            margin: 0 5px;
             font-size: 0.85rem;
             transition: opacity 0.2s;
         }
@@ -176,7 +187,7 @@
                 <img src="{{url_for('static',filename='logo.png')}}" alt="Google Developer Group">
             </div>
             <nav>
-                <a href="/" class="active">Home</a>
+                <a href="/" class="active">Dashboard</a>
                 <a href="/">Progress</a>
                 <a href="#">About</a>
             </nav>
@@ -337,33 +348,105 @@
             
             function renderCompletionRateChart(completionData) {
                 const ctx = document.getElementById('completionRateChart').getContext('2d');
-                const originalLabels = Object.keys(completionData);
-                const values = Object.values(completionData);
-                if (completionRateChart) { completionRateChart.destroy(); }
+
+                // Define the correct order of labs to ensure consistent charting
+                const labOrder = [
+                    'The Basics of Google Cloud Compute',
+                    'Get Started with Cloud Storage',
+                    'Get Started with Pub_Sub',
+                    'Get Started with API Gateway',
+                    'Get Started with Looker',
+                    'Get Started with Dataplex',
+                    'Get Started with Google Workspace Tools',
+                    'App Building with AppSheet',
+                    'Develop with Apps Script and AppSheet',
+                    'Develop GenAI Apps with Gemini and Streamlit',
+                    'Build a Website on Google Cloud',
+                    'Set Up a Google Cloud Network',
+                    'Store, Process, and Manage Data on Google Cloud - Console',
+                    'Cloud Run Functions: 3 Ways',
+                    'App Engine: 3 Ways',
+                    'Cloud Speech API: 3 Ways',
+                    'Analyze Speech and Language with Google APIs',
+                    'Monitoring in Google Cloud',
+                    'Prompt Design in Vertex AI',
+                    'Gen AI Arcade Game: Level 3'
+                ];
+
+                // Map the completion data to the defined lab order
+                const originalLabels = labOrder;
+                const values = originalLabels.map(labName => completionData[labName] || 0);
+
+                if (completionRateChart) {
+                    completionRateChart.destroy();
+                }
+
                 completionRateChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: originalLabels.map((_, i) => `Lab ${i + 1}`),
-                        datasets: [{ label: 'Completion Count', data: values, backgroundColor: '#4285F4', borderColor: '#1a73e8', borderWidth: 1 }]
+                        labels: originalLabels.map((_, i) => {
+                            if (i + 1 === 20) {
+                                return 'Arcade';
+                            }
+                            return `Lab ${i + 1}`;
+                        }),
+                        datasets: [{
+                            label: 'Completion Count',
+                            data: values,
+                            backgroundColor: '#4285F4',
+                            borderColor: '#1a73e8',
+                            borderWidth: 1
+                        }]
                     },
                     options: {
-                        responsive: true, maintainAspectRatio: false,
+                        responsive: true,
+                        maintainAspectRatio: false,
                         plugins: {
                             legend: { display: false },
-                            tooltip: { callbacks: {
-                                title: (context) => context[0].label,
-                                label: (context) => [`Name: ${originalLabels[context.dataIndex]}`, `Completions: ${context.parsed.y}`]
-                            }}
+                            tooltip: {
+                                callbacks: {
+                                    title: (context) => context[0].label,
+                                    label: (context) => [
+                                        `Name: ${originalLabels[context.dataIndex]}`,
+                                        `Completions: ${context.parsed.y}`
+                                    ]
+                                }
+                            }
                         },
-                        scales: { y: { beginAtZero: true, title: { display: true, text: 'Number of Completions' } }, x: { title: { display: true, text: 'Lab Number' } } },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Number of Completions'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Lab Number'
+                                }
+                            }
+                        },
                         animation: {
                             ...disabledAnimation,
-                            y: { duration: 1000, easing: 'easeOutCirc', from: (ctx) => ctx.chart.scales.y.getPixelForValue(0), delay: (context) => context.dataIndex * 50, },
-                            opacity: { duration: 1000, from: 0.1, delay: (context) => context.dataIndex * 50, }
+                            y: {
+                                duration: 1000,
+                                easing: 'easeOutCirc',
+                                from: (ctx) => ctx.chart.scales.y.getPixelForValue(0),
+                                delay: (context) => context.dataIndex * 50
+                            },
+                            opacity: {
+                                duration: 1000,
+                                from: 0.1,
+                                delay: (context) => context.dataIndex * 50
+                            }
                         }
                     }
                 });
             }
+
+
 
             function renderPopularityChart(popularityData) {
                 const ctx = document.getElementById('popularityChart').getContext('2d');

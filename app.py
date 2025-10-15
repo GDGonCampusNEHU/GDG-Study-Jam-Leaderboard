@@ -37,7 +37,8 @@ LABS = [
     "Cloud Speech API: 3 Ways",
     "Analyze Speech and Language with Google APIs",
     "Monitoring in Google Cloud",
-    "Prompt Design in Vertex AI"
+    "Prompt Design in Vertex AI",
+    "Gen AI Arcade Game: Level 3"
 ]
 
 
@@ -73,7 +74,8 @@ def get_participant_data():
         "Cloud Speech API: 3 Ways",
         "Analyze Speech and Language with Google APIs",
         "Monitoring in Google Cloud",
-        "Prompt Design in Vertex AI"
+        "Prompt Design in Vertex AI",
+        "Gen AI Arcade Game: Level 3"
     ]
     names_of_lab = []
     ranking_list = []
