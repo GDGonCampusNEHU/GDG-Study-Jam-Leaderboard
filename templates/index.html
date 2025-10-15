@@ -97,7 +97,8 @@
         /* --- RESPONSIVE STYLES --- */
         @media (max-width: 1024px) {
             .container { padding-left: 20px; padding-right: 20px; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); 
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            /* This rule now correctly overrides the base style to stack charts on tablets and phones */
             .charts-grid { grid-template-columns: repeat(1, 1fr); }
         }
 
