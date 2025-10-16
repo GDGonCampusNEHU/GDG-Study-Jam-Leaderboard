@@ -457,7 +457,7 @@
 
                 const createPlace = (place, participant) => {
                     if (!participant) return '';
-                    const rankText = {first: '1', second: '2', third: '3'};
+                    const rankText = {first: '1🥇', second: '2🥈', third: '3🥉'};
                     const colorIndex = participants.findIndex(p => p.email === participant.email);
                     const avatarColor = colors[colorIndex % colors.length];
 
