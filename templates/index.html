@@ -3,199 +3,385 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Cloud Study Jams 2025</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Dashboard - Google Cloud Study Jams 2025</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        /* General Body and Layout */
-        body {
-            overflow-x: hidden;
+        /* CSS Reset & Base Styles */
+        :root {
+            --google-blue: #4285F4;
+            --google-red: #EA4335;
+            --google-yellow: #FBBC05;
+            --google-green: #34A853;
+            --primary-text: #202124;
+            --secondary-text: #5f6368;
+            --bg-color: #f0f2f5;
+            --card-border-color: rgba(0, 0, 0, 0.1);
+            --font-family-header: 'Google Sans', sans-serif;
+            --font-family-body: 'Roboto', sans-serif;
         }
-        .overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.5); z-index: 999;
-            opacity: 0; visibility: hidden;
-            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-        }
-        .overlay.is-active {
-            opacity: 1; visibility: visible;
-        }
-        #hamburger-btn {
-            display: none; background: transparent; border: none;
-            cursor: pointer; z-index: 1001; padding: 5px;
-        }
-        #hamburger-btn svg { stroke: #5f6368; }
 
-        /* Loader Styles */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-body);
+            background-color: var(--bg-color);
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(66, 133, 244, 0.05), transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(234, 67, 53, 0.05), transparent 40%);
+            margin: 0;
+            color: var(--primary-text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Main Container & Layout */
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        
+        main {
+            padding: 2rem 0;
+            flex-grow: 1;
+        }
+
+        /* Header & Navigation */
+        .site-header {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            padding: 12px 0;
+            background: rgba(240, 242, 245, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo img {
+            height: 80px;
+            display: block;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--secondary-text);
+            font-family: var(--font-family-header);
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 99px;
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+        }
+
+        nav a:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        nav a.active {
+            background-color: rgba(66, 133, 244, 0.1);
+            color: var(--google-blue);
+        }
+
+        #hamburger-btn { display: none; }
+
+        /* Main Header Section */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .title-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .gcp-logo { height: 48px; }
+
+        .main-header h1 {
+            font-family: var(--font-family-header);
+            font-size: 2rem;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .main-header p {
+            color: var(--secondary-text);
+            margin: 4px 0 0;
+            font-size: 1rem;
+        }
+
+        #refresh-btn {
+            background-color: transparent;
+            border: 1px solid #ddd;
+            border-radius: 99px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            font-family: var(--font-family-header);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            color: var(--secondary-text);
+        }
+        #refresh-btn:hover {
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        #refresh-btn svg { transition: transform 0.5s; }
+        #refresh-btn:hover svg { transform: rotate(180deg); }
+
+        /* Loader */
         #loader-container {
-            display: none; justify-content: center; align-items: center;
-            padding: 50px 0; width: 100%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 50px 0;
+            width: 100%;
         }
         .loader {
-            border: 8px solid #f3f3f3; border-top: 8px solid #4285F4;
-            border-radius: 50%; width: 60px; height: 60px;
-            animation: spin 1.5s linear infinite;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: inline-block;
+            position: relative;
+            border: 3px solid;
+            border-color: #DDD #DDD transparent transparent;
+            animation: spin 1s linear infinite;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        /* --- NEW: Base styles for grid layouts --- */
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Glassmorphism Card Style */
+        .card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            padding: 24px;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .card h3 {
+            margin: 0 0 16px;
+            font-size: 1rem;
+            color: var(--secondary-text);
+            font-family: var(--font-family-header);
+            font-weight: 500;
+        }
+
+        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
+            gap: 24px;
         }
+        
+        .stat-card .large-text {
+            font-size: 3.5rem;
+            font-weight: 700;
+            font-family: var(--font-family-header);
+            color: var(--primary-text);
+            line-height: 1;
+        }
+
+        .stat-card .subtitle {
+            font-size: 0.9rem;
+            color: var(--secondary-text);
+            margin-top: 4px;
+        }
+
+        /* Completion Circle */
+        .progress-circle-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 110px;
+        }
+        @property --p {
+            syntax: '<number>';
+            inherits: true;
+            initial-value: 0;
+        }
+        .progress-circle {
+            --p:0;
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: conic-gradient(var(--google-blue) calc(var(--p) * 1%), #e9eef6 0);
+            transition: --p 1s ease-in-out;
+        }
+        .progress-circle .circle-text {
+            font-family: var(--font-family-header);
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary-text);
+            background: #fff;
+            width: 85px;
+            height: 85px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+        }
+
+        /* Top Performer Card */
+        .performer-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 8px;
+        }
+        .avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background-color: var(--google-green);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+            font-family: var(--font-family-header);
+        }
+        .performer-details {
+            line-height: 1.3;
+        }
+        .performer-name {
+            margin: 0;
+            font-weight: 500;
+            color: var(--primary-text);
+        }
+        #top-performer-badges {
+            font-size: 0.9rem;
+            color: var(--secondary-text);
+        }
+
+        /* Charts Section */
         .charts-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-top: 30px;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 24px;
         }
-        .stat-card, .chart-card {
-            background-color: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 20px;
+        .chart-container {
+            position: relative;
+            height: 350px;
         }
 
-        /* Footer Styles */
+        /* Footer */
         footer {
             text-align: center;
-            padding: 20px 0;
-            margin-top: auto;
-            border-top: 1px solid #e0e0e0;
-            color: #5f6368;
-            font-size: 0.85rem;
-            flex-shrink: 0;
-        }
-        .footer-content {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 25px;
-            flex-wrap: wrap;
-        }
-        .footer-content p {
-            margin: 0;
-        }
-        .developer-profiles {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .profile-name {
-            font-weight: 500;
-            color: #202124;
-            margin: 0;
-        }
-        .social-links a {
-            color: #4285F4;
-            text-decoration: none;
-            margin: 0 5px;
-            font-size: 0.85rem;
-            transition: opacity 0.2s;
-        }
-        .social-links a:hover {
-            opacity: 0.7;
-            text-decoration: underline;
+            padding: 32px 0;
+            margin-top: 32px;
+            border-top: 1px solid rgba(0,0,0,0.08);
+            color: var(--secondary-text);
+            font-size: 0.9rem;
         }
 
-        /* --- RESPONSIVE STYLES --- */
-        @media (max-width: 1024px) {
-            .container { padding-left: 20px; padding-right: 20px; }
+        /* Responsive Design */
+        @media (max-width: 1200px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            /* This rule now correctly overrides the base style to stack charts on tablets and phones */
-            .charts-grid { grid-template-columns: repeat(1, 1fr); }
+            .charts-grid { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 768px) {
-            #hamburger-btn { display: block; }
-            nav {
-                flex-direction: column; justify-content: center; gap: 2rem;
-                position: fixed; top: 0; right: 0; width: 75%; max-width: 300px;
-                height: 100vh; background: #fff; z-index: 1000;
-                transform: translateX(100%); transition: transform 0.3s ease-in-out;
-                display: flex;
-            }
-            nav.is-active { transform: translateX(0); }
-            nav a { font-size: 1.25rem; padding: 10px; }
-            
-            header .logo img {
-                width: 250px; height: auto;
-            }
-            .main-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                gap: 15px;
-            }
-            .main-header .title-section h1 {
-                font-size: 1.2rem;
-            }
-            #refresh-btn {
-                padding: 8px;
-            }
-            #refresh-btn span {
-                display: none;
-            }
-            .stats-grid {
-                grid-template-columns: 1fr; gap: 15px;
-            }
-            .stat-card {
-                padding: 20px; 
-                display: flex; 
-                flex-direction: column; 
-                justify-content: center;
-                align-items: center; 
-                text-align: center; 
-            }
-            .stat-card h3 {
-                font-size: 0.95rem; margin-bottom: 12px;
-            }
-            .stat-card .large-text {
-                font-size: 2.5rem;
-            }
-            .performer-info {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 10px;
-            }
-            .performer-info .avatar {
-                width: 48px; height: 48px;
-            }
-            .charts-grid { gap: 15px; }
-            .chart-container { min-height: 300px; }
+            body { background-image: none; }
+            .container { padding: 0 16px; }
+            .logo img { height: 55px; }
+            .main-header h1 { font-size: 1.5rem; }
+            .gcp-logo { height: 36px; }
 
-            .developer-profiles {
+            /* Mobile Navigation */
+            nav {
+                display: none;
+                position: fixed;
+                top: 0;
+                right: 0;
+                width: 280px;
+                height: 100vh;
+                background: #fff;
                 flex-direction: column;
-                gap: 25px;
+                padding: 20px;
+                box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+                align-items: flex-start;
+                gap: 1rem;
             }
+            nav.is-active { display: flex; }
+            #hamburger-btn {
+                display: block;
+                background: transparent;
+                border: none;
+                cursor: pointer;
+                z-index: 1001;
+                padding: 5px;
+            }
+            .overlay {
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background-color: rgba(0, 0, 0, 0.4); z-index: 99;
+                opacity: 0; visibility: hidden;
+                transition: opacity 0.3s, visibility 0.3s;
+            }
+            .overlay.is-active { opacity: 1; visibility: visible; }
+            
+            #refresh-btn span { display: none; }
+            #refresh-btn { padding: 10px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .stat-card .large-text { font-size: 2.75rem; }
+            .chart-container { height: 300px; }
         }
     </style>
 </head>
 <body>
     <div class="overlay"></div>
-    <div class="container">
-        <header>
-            <div class="logo">
-                <img src="{{url_for('static',filename='logo.png')}}" alt="Google Developer Group">
-            </div>
+    <header class="site-header">
+        <div class="container header-content">
+            <a href="/dashboard" class="logo">
+                <img src="/static/logo.png" alt="Google Developers Logo">
+            </a>
             <nav>
-                <a href="/" class="active">Dashboard</a>
+                <a href="/dashboard" class="active">Dashboard</a>
                 <a href="/">Progress</a>
-                <a href="#">About</a>
             </nav>
             <button id="hamburger-btn" aria-label="Toggle menu" aria-expanded="false">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
            </button>
-        </header>
+        </div>
+    </header>
 
+    <div class="container">
         <main>
             <div class="main-header">
                 <div class="title-section">
@@ -206,8 +392,8 @@
                     </div>
                 </div>
                 <button id="refresh-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                    <span>Refresh</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                    <span>Refresh Data</span>
                 </button>
             </div>
             
@@ -216,73 +402,55 @@
             </div>
             
             <section class="stats-grid">
-                <div class="stat-card">
+                <div class="stat-card card">
                     <h3>Total Participants</h3>
                     <p id="total-participants" class="large-text">0</p>
                 </div>
-                <div class="stat-card">
-                    <h3>Completion %</h3>
+                <div class="stat-card card">
+                    <h3>Overall Completion</h3>
                     <div class="progress-circle-container">
-                        <div id="completion-circle" class="progress-circle" style="--p:0;">
+                        <div id="completion-circle" class="progress-circle">
                             <div id="completion-percentage" class="circle-text">0%</div>
                         </div>
                     </div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card card">
                     <h3>Average Progress</h3>
                     <p id="average-progress" class="large-text">0</p>
-                    <span>badges / person</span>
+                    <p class="subtitle">badges / person</p>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card card">
                     <h3>Top Performer</h3>
                     <div class="performer-info">
                         <div id="top-performer-initials" class="avatar">--</div>
-                        <div>
+                        <div class="performer-details">
                             <p id="top-performer" class="performer-name">N/A</p>
-                            <span id="top-performer-badges"></span>
+                            <span id="top-performer-badges">0 badges</span>
                         </div>
                     </div>
                 </div>
             </section>
 
             <section class="charts-grid">
-                <div class="chart-card">
+                <div class="chart-card card">
                     <h3>Badge Completion Rate</h3>
                     <div class="chart-container">
                         <canvas id="completionRateChart"></canvas>
                     </div>
                 </div>
-                <div class="chart-card">
-                    <h3>Badge Popularity</h3>
+                <div class="chart-card card">
+                    <h3>Badge Popularity (Top 6)</h3>
                     <div class="chart-container">
                         <canvas id="popularityChart"></canvas>
                     </div>
                 </div>
             </section>
         </main>
-
-        <footer>
-            <div class="footer-content">
-                <p>Developed with ❤️ by</p>
-                <div class="developer-profiles">
-                    <div class="profile">
-                        <p class="profile-name">Soumojit Bhuin</p>
-                        <div class="social-links">
-                            <a href="https://github.com/SoumojitBhuin" target="_blank" rel="noopener noreferrer">GitHub</a>
-                            <a href="https://www.linkedin.com/in/soumojit-bhuin-313328345/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-                        </div>
-                    </div>
-                    <div class="profile">
-                        <p class="profile-name">Rohit K. Shaw</p>
-                        <div class="social-links">
-                            <a href="https://github.com/shawrhit" target="_blank" rel="noopener noreferrer">GitHub</a>
-                            <a href="https://www.linkedin.com/in/shawrhit" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </footer>
     </div>
+
+    <footer>
+        <p>Developed with ❤️ by Soumojit Bhuin & Rohit K. Shaw</p>
+    </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -300,30 +468,20 @@
                 hamburgerBtn.setAttribute('aria-expanded', isActive);
                 document.body.style.overflow = isActive ? 'hidden' : '';
                 if (isActive) {
-                    hamburgerBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+                    hamburgerBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
                 } else {
-                    hamburgerBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`;
+                    hamburgerBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`;
                 }
             };
 
-            const staggeredAnimation = {
-                duration: 1200, easing: 'easeOutBounce',
-                delay: (context) => {
-                    if (context.type !== 'data' || context.mode !== 'default') return 0;
-                    return context.dataIndex * 100;
-                },
-            };
-
-            const disabledAnimation = { duration: 0 };
-
-            async function fetchData() {
+            async function fetchData(isRefresh = false) {
                 loaderContainer.style.display = 'flex';
                 contentSections.forEach(section => section.style.display = 'none');
                 try {
                     const response = await fetch('/api/home-data');
                     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                     const data = await response.json();
-                    updateUI(data);
+                    updateUI(data, isRefresh);
                 } catch (error) {
                     console.error('Error fetching data:', error);
                 } finally {
@@ -333,141 +491,136 @@
                 }
             }
 
-            function updateUI(data) {
+            function updateUI(data, isRefresh) {
                 document.getElementById('total-participants').textContent = data.total_participants;
                 const completionCircle = document.getElementById('completion-circle');
                 completionCircle.style.setProperty('--p', data.completion_percentage);
                 document.getElementById('completion-percentage').textContent = `${data.completion_percentage}%`;
                 document.getElementById('average-progress').textContent = data.average_progress;
-                document.getElementById('top-performer-initials').textContent = data.top_performer.initials;
-                document.getElementById('top-performer').textContent = data.top_performer.name;
-                document.getElementById('top-performer-badges').textContent = `${data.top_performer.badges} badges`;
-                renderCompletionRateChart(data.badge_completion_rate);
-                renderPopularityChart(data.badge_popularity);
+                
+                const topPerformer = data.top_performer;
+                document.getElementById('top-performer-initials').textContent = topPerformer.initials;
+                document.getElementById('top-performer').textContent = topPerformer.name;
+                document.getElementById('top-performer-badges').textContent = `${topPerformer.badges} badges`;
+
+                renderCompletionRateChart(data.badge_completion_rate, isRefresh);
+                renderPopularityChart(data.badge_popularity, isRefresh);
             }
             
-            function renderCompletionRateChart(completionData) {
+            const chartDefaultOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#fff',
+                        titleColor: '#202124',
+                        bodyColor: '#5f6368',
+                        borderColor: '#ddd',
+                        borderWidth: 1,
+                        padding: 10,
+                        titleFont: { family: 'Google Sans', weight: '500' },
+                        bodyFont: { family: 'Roboto' }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#e0e0e0', drawBorder: false },
+                        ticks: { color: '#5f6368', font: { family: 'Roboto' } }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#5f6368', font: { family: 'Roboto' } }
+                    }
+                }
+            };
+
+            function renderCompletionRateChart(completionData, isRefresh) {
                 const ctx = document.getElementById('completionRateChart').getContext('2d');
-
-                // Define the correct order of labs to ensure consistent charting
-                const labOrder = [
-                    'The Basics of Google Cloud Compute',
-                    'Get Started with Cloud Storage',
-                    'Get Started with Pub_Sub',
-                    'Get Started with API Gateway',
-                    'Get Started with Looker',
-                    'Get Started with Dataplex',
-                    'Get Started with Google Workspace Tools',
-                    'App Building with AppSheet',
-                    'Develop with Apps Script and AppSheet',
-                    'Develop GenAI Apps with Gemini and Streamlit',
-                    'Build a Website on Google Cloud',
-                    'Set Up a Google Cloud Network',
-                    'Store, Process, and Manage Data on Google Cloud - Console',
-                    'Cloud Run Functions: 3 Ways',
-                    'App Engine: 3 Ways',
-                    'Cloud Speech API: 3 Ways',
-                    'Analyze Speech and Language with Google APIs',
-                    'Monitoring in Google Cloud',
-                    'Prompt Design in Vertex AI',
-                    'Gen AI Arcade Game: Level 3'
-                ];
-
-                // Map the completion data to the defined lab order
+                const labOrder = ['The Basics of Google Cloud Compute', 'Get Started with Cloud Storage', 'Get Started with Pub_Sub', 'Get Started with API Gateway', 'Get Started with Looker', 'Get Started with Dataplex', 'Get Started with Google Workspace Tools', 'App Building with AppSheet', 'Develop with Apps Script and AppSheet', 'Develop GenAI Apps with Gemini and Streamlit', 'Build a Website on Google Cloud', 'Set Up a Google Cloud Network', 'Store, Process, and Manage Data on Google Cloud - Console', 'Cloud Run Functions: 3 Ways', 'App Engine: 3 Ways', 'Cloud Speech API: 3 Ways', 'Analyze Speech and Language with Google APIs', 'Monitoring in Google Cloud', 'Prompt Design in Vertex AI', 'Gen AI Arcade Game: Level 3'];
                 const originalLabels = labOrder;
                 const values = originalLabels.map(labName => completionData[labName] || 0);
 
-                if (completionRateChart) {
-                    completionRateChart.destroy();
-                }
+                if (completionRateChart) completionRateChart.destroy();
 
                 completionRateChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: originalLabels.map((_, i) => {
-                            if (i + 1 === 20) {
-                                return 'Arcade';
-                            }
-                            return `Lab ${i + 1}`;
-                        }),
+                        labels: originalLabels.map((_, i) => i + 1 === 20 ? 'Arcade' : `Lab ${i + 1}`),
                         datasets: [{
-                            label: 'Completion Count',
+                            label: 'Completions',
                             data: values,
-                            backgroundColor: '#4285F4',
-                            borderColor: '#1a73e8',
-                            borderWidth: 1
+                            backgroundColor: 'rgba(66, 133, 244, 0.8)',
+                            borderColor: 'rgba(66, 133, 244, 1)',
+                            borderWidth: 1,
+                            borderRadius: 4
                         }]
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
+                    options: { ...chartDefaultOptions,
+                        animation: isRefresh ? false : {
+                            duration: 1000,
+                            easing: 'easeOutCubic',
+                            delay: (context) => context.dataIndex * 25
+                        },
                         plugins: {
-                            legend: { display: false },
+                            ...chartDefaultOptions.plugins,
                             tooltip: {
+                                ...chartDefaultOptions.plugins.tooltip,
                                 callbacks: {
-                                    title: (context) => context[0].label,
-                                    label: (context) => [
-                                        `Name: ${originalLabels[context.dataIndex]}`,
-                                        `Completions: ${context.parsed.y}`
-                                    ]
+                                    title: (context) => originalLabels[context[0].dataIndex],
+                                    label: (context) => `Completions: ${context.parsed.y}`
                                 }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Number of Completions'
-                                }
-                            },
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'Lab Number'
-                                }
-                            }
-                        },
-                        animation: {
-                            ...disabledAnimation,
-                            y: {
-                                duration: 1000,
-                                easing: 'easeOutCirc',
-                                from: (ctx) => ctx.chart.scales.y.getPixelForValue(0),
-                                delay: (context) => context.dataIndex * 50
-                            },
-                            opacity: {
-                                duration: 1000,
-                                from: 0.1,
-                                delay: (context) => context.dataIndex * 50
                             }
                         }
                     }
                 });
             }
 
-
-
-            function renderPopularityChart(popularityData) {
+            function renderPopularityChart(popularityData, isRefresh) {
                 const ctx = document.getElementById('popularityChart').getContext('2d');
-                const labels = popularityData.map(item => item[0].replace('Get Started with ', ''));
+                const labels = popularityData.map(item => item[0].replace(/Get Started with|Develop with|App Building with/g, '').trim());
                 const values = popularityData.map(item => item[1]);
+                const backgroundColors = ['#4285F4', '#EA4335', '#FBBC05', '#34A853', '#AB47BC', '#00ACC1'].map(c => c + 'CC');
+                const borderColors = ['#4285F4', '#EA4335', '#FBBC05', '#34A853', '#AB47BC', '#00ACC1'];
+
                 if (popularityChart) popularityChart.destroy();
                 popularityChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: { labels: labels, datasets: [{ data: values, backgroundColor: '#4285F4' }] },
+                    type: 'doughnut',
+                    data: { 
+                        labels: labels, 
+                        datasets: [{ 
+                            data: values, 
+                            backgroundColor: backgroundColors,
+                            borderColor: '#fff',
+                            borderWidth: 2,
+                        }] 
+                    },
                     options: {
-                        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { x: { beginAtZero: true } },
-                        animation: { ...disabledAnimation, x: { ...staggeredAnimation, from: (ctx) => ctx.chart.scales.x.getPixelForValue(0) } }
+                        ...chartDefaultOptions,
+                        cutout: '70%',
+                        animation: isRefresh ? false : {
+                             duration: 1000,
+                             easing: 'easeOutCubic'
+                        },
+                        plugins: {
+                            ...chartDefaultOptions.plugins,
+                            legend: {
+                                display: true,
+                                position: 'right',
+                                labels: {
+                                    font: { family: 'Roboto' },
+                                    boxWidth: 20
+                                }
+                            }
+                        },
                     }
                 });
             }
             
             hamburgerBtn.addEventListener('click', toggleMenu);
             overlay.addEventListener('click', toggleMenu);
-            refreshBtn.addEventListener('click', fetchData);
+            refreshBtn.addEventListener('click', () => fetchData(true));
             fetchData();
         });
     </script>

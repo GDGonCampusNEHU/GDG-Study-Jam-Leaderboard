@@ -4,255 +4,344 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Progress - Google Cloud Study Jams 2025</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        /* General Body and Layout */
+        :root {
+            --google-blue: #4285F4;
+            --google-green: #34A853;
+            --google-yellow: #FBBC05;
+            --primary-text: #202124;
+            --secondary-text: #5f6368;
+            --bg-color: #f0f2f5;
+            --font-family-header: 'Google Sans', sans-serif;
+            --font-family-body: 'Roboto', sans-serif;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
         body {
-            overflow-x: hidden; 
+            font-family: var(--font-family-body);
+            background-color: var(--bg-color);
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(66, 133, 244, 0.05), transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(52, 168, 83, 0.05), transparent 40%);
+            margin: 0;
+            color: var(--primary-text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
-        .overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.5); z-index: 999;
-            opacity: 0; visibility: hidden;
-            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        .container {
+            width: 100%; max-width: 1400px; margin: 0 auto;
+            padding: 0 24px;
         }
-        .overlay.is-active { opacity: 1; visibility: visible; }
-
-        header { display: flex; justify-content: space-between; align-items: center; }
-        #hamburger-btn {
-            display: none; background: transparent; border: none;
-            cursor: pointer; z-index: 1001; padding: 5px;
+        main { padding: 2rem 0; flex-grow: 1; }
+        .site-header {
+            position: sticky; top: 0; width: 100%; z-index: 100;
+            padding: 12px 0;
+            background: rgba(240, 242, 245, 0.7);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
         }
-        #hamburger-btn svg { stroke: #5f6368; }
-
+        .header-content { display: flex; justify-content: space-between; align-items: center; }
+        .logo img { height: 80px; display: block; }
+        nav { display: flex; align-items: center; gap: 8px; }
+        nav a {
+            text-decoration: none; color: var(--secondary-text);
+            font-family: var(--font-family-header); font-weight: 500;
+            padding: 8px 16px; border-radius: 99px;
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+        }
+        nav a:hover { background-color: rgba(0, 0, 0, 0.05); }
+        nav a.active { background-color: rgba(66, 133, 244, 0.1); color: var(--google-blue); }
+        #hamburger-btn { display: none; }
+        .main-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1rem; flex-wrap: wrap; gap: 16px;
+        }
+        .title-section { display: flex; align-items: center; gap: 16px; }
+        .gcp-logo { height: 48px; }
+        .main-header h1 {
+            font-family: var(--font-family-header); font-size: 2rem;
+            margin: 0; line-height: 1.2;
+        }
+        .main-header p { color: var(--secondary-text); margin: 4px 0 0; font-size: 1rem; }
+        #refresh-btn {
+            background-color: transparent; border: 1px solid #ddd;
+            border-radius: 99px; padding: 10px 20px; cursor: pointer;
+            font-weight: 500; font-family: var(--font-family-header);
+            display: inline-flex; align-items: center; gap: 8px;
+            transition: background-color 0.2s, box-shadow 0.2s; color: var(--secondary-text);
+        }
+        #refresh-btn:hover { background-color: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        #refresh-btn svg { transition: transform 0.5s; }
+        #refresh-btn:hover svg { transform: rotate(180deg); }
         #loader-container {
             display: none; justify-content: center; align-items: center;
             padding: 50px 0; width: 100%;
         }
         .loader {
-            border: 8px solid #f3f3f3; border-top: 8px solid #4285F4;
-            border-radius: 50%; width: 60px; height: 60px;
-            animation: spin 1.5s linear infinite;
+            width: 48px; height: 48px; border-radius: 50%;
+            display: inline-block; position: relative; border: 3px solid;
+            border-color: #DDD #DDD transparent transparent;
+            animation: spin 1s linear infinite;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        /* --- PODIUM STYLES --- */
+        .podium-section {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 1.5%;
+            padding: 48px 0;
+            margin-bottom: 2.5rem;
+            min-height: 300px;
+        }
+        .podium-place {
+            text-align: center;
+            width: 28%;
+            max-width: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        .podium-details {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform: translateY(-8px);
+            transition: transform 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+        .podium-place:hover .podium-details {
+            transform: translateY(-16px);
+        }
+        .podium-avatar {
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.5rem;
+            font-family: var(--font-family-header);
+            border: 4px solid white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background-size: cover;
+            background-position: center;
+        }
+        .podium-place.first .podium-avatar { width: 120px; height: 120px; font-size: 3rem; }
+        .podium-name { font-weight: 700; font-family: var(--font-family-header); margin: 12px 0 4px; font-size: 1.1rem; }
+        .podium-badges { font-size: 0.9rem; color: var(--secondary-text); }
+        .podium-stand {
+            width: 100%;
+            color: var(--primary-text);
+            font-size: 2.5rem;
+            font-weight: 700;
+            font-family: var(--font-family-header);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-top: 10px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+        .podium-place.second .podium-stand { height: 120px; border-radius: 12px 12px 0 0; background-color: #E8EAED; color: #B0B0B0;}
+        .podium-place.first .podium-stand { height: 180px; border-radius: 16px 16px 0 0; background-color: var(--google-yellow); color: white; }
+        .podium-place.third .podium-stand { height: 90px; border-radius: 12px 12px 0 0; background-color: #D2A679; color: white;}
 
-        /* General Table Styles */
-        .table-container { overflow-x: scroll; } /* Changed 'auto' to 'scroll' */
+        .controls-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap;
+        }
+        .search-container {
+            display: flex; align-items: center; gap: 8px;
+            border: 1px solid #ddd; border-radius: 99px;
+            padding: 4px 4px 4px 16px; background: #fff;
+            flex-grow: 1; max-width: 400px;
+        }
+        .search-container svg { color: var(--secondary-text); }
+        .search-container input {
+            width: 100%; padding: 8px; border: none; outline: none;
+            background: transparent; font-family: var(--font-family-body);
+            font-size: 1rem; flex-grow: 1;
+        }
+        #export-csv {
+            background-color: transparent; border: 1px solid #ddd;
+            border-radius: 99px; padding: 10px 20px;
+            cursor: pointer; font-weight: 500; font-family: var(--font-family-header);
+            display: inline-flex; align-items: center; gap: 8px;
+            transition: background-color 0.2s, box-shadow 0.2s; color: var(--secondary-text);
+        }
+        #export-csv:hover { background-color: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .table-wrapper {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        .table-container { overflow-x: auto; }
         #progress-table {
-            width: 100%; border-collapse: collapse; font-size: 14px;
-            text-align: left; white-space: nowrap;
+            width: 100%; border-collapse: collapse;
+            font-size: 0.9rem; text-align: left; white-space: nowrap;
         }
         #progress-table th, #progress-table td {
-            padding: 16px; border-bottom: 1px solid #e0e0e0; vertical-align: middle;
+            padding: 16px; border-bottom: 1px solid rgba(0,0,0,0.08);
+            vertical-align: middle;
         }
-        #progress-table thead { background-color: #f8f9fa; }
-        #progress-table th { color: #5f6368; font-weight: 500; }
-        tbody tr:hover { background-color: #f1f3f4; }
+        #progress-table thead {
+            background-color: rgba(240, 242, 245, 0.5);
+            position: sticky; top: 0; z-index: 10;
+        }
+        #progress-table th { color: var(--secondary-text); font-weight: 500; font-family: var(--font-family-header); }
+        #progress-table tbody tr:hover { background-color: rgba(66, 133, 244, 0.05); }
         
-        /* Column Specific Styles */
+        #progress-table tbody tr.top-20-highlight {
+            background-color: #e8f0fe;
+            border-left: 4px solid var(--google-blue);
+        }
+        #progress-table tbody tr.top-20-highlight:hover {
+            background-color: #dce9fd;
+        }
+        .rank-indicator {
+            color: var(--google-blue);
+            font-size: 1.1rem;
+            margin-right: 4px;
+        }
+
+        tbody tr:last-child td { border-bottom: none; }
         #progress-table .rank-cell {
-            font-weight: bold; font-size: 24px; width: 60px;
-            text-align: center; line-height: 1;
+            font-weight: 500; 
+            font-size: 1.1rem; 
+            width: 80px;
+            text-align: center; 
+            color: var(--primary-text);
         }
         #progress-table .participant-name {
             display: flex; align-items: center; gap: 12px;
-            font-weight: 500; padding-right: 40px;
+            font-weight: 500; color: var(--primary-text);
         }
         #progress-table .avatar {
             width: 36px; height: 36px; border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            color: white; font-weight: 500; font-size: 14px; margin-top: 0;
+            color: white; font-weight: 500; font-size: 14px;
         }
         #progress-table .badge-count { min-width: 150px; }
         #progress-table .count-chip {
-            display: inline-block; background-color: #4285F4; color: white;
-            padding: 6px 16px; border-radius: 20px; font-weight: 500;
-            font-size: 13px; line-height: 1;
+            display: inline-block; background-color: #e8f0fe; color: #174ea6;
+            padding: 4px 12px; border-radius: 20px; font-weight: 500;
+            font-size: 0.8rem; line-height: 1.5;
         }
         #progress-table .progress-bar-container {
             height: 6px; background-color: #e9eef6; border-radius: 3px;
-            margin-top: 8px; overflow: hidden;
+            margin-top: 8px; overflow: hidden; max-width: 120px;
         }
         #progress-table .progress-bar {
-            height: 100%; background-color: #34A853; border-radius: 3px;
+            height: 100%; background-color: var(--google-green); border-radius: 3px;
             transition: width 0.4s ease-in-out;
         }
         #progress-table .status-cell { text-align: center; }
-        #progress-table .check-mark-icon {
-            display: inline-flex; justify-content: center; align-items: center;
-            width: 24px; height: 24px; border-radius: 50%;
-            background-color: #e6f4ea; stroke: #34A853;
-        }
-        #progress-table tbody tr.top-ranker { cursor: pointer; }
-
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.6); display: none;
-            justify-content: center; align-items: center; z-index: 1000;
-            animation: fadeIn 0.3s;
-        }
-        .modal-content {
-            background-color: white; padding: 30px; border-radius: 8px;
-            text-align: center; position: relative; max-width: 400px;
-            width: 90%; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            animation: scaleUp 0.3s ease-out;
-        }
-        .modal-close {
-            position: absolute; top: 10px; right: 15px; font-size: 28px;
-            font-weight: bold; color: #888; cursor: pointer;
-        }
-        .modal-close:hover { color: #000; }
-        .modal-content .rank-icon { font-size: 72px; margin-bottom: 15px; }
-        .modal-content h2 { margin-top: 0; font-size: 24px; color: #202124; }
-        .modal-content p { font-size: 16px; color: #5f6368; margin: 10px 0; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes scaleUp { from { transform: scale(0.9); } to { transform: scale(1); } }
-
-        /* Footer Styles */
+        #progress-table .check-mark-icon { color: var(--google-green); }
         footer {
-            text-align: center;
-            padding: 20px 0;
-            margin-top: auto;
-            border-top: 1px solid #e0e0e0;
-            color: #5f6368;
-            font-size: 0.85rem;
-            flex-shrink: 0;
+            text-align: center; padding: 32px 0; margin-top: 32px;
+            border-top: 1px solid rgba(0,0,0,0.08);
+            color: var(--secondary-text); font-size: 0.9rem;
         }
-        .footer-content {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 25px;
-            flex-wrap: wrap;
-        }
-        .footer-content p {
-            margin: 0;
-        }
-        .developer-profiles {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .profile-name {
-            font-weight: 500;
-            color: #202124;
-            margin: 0;
-        }
-        .social-links a {
-            color: #4285F4;
-            text-decoration: none;
-            margin: 0 5px;
-            font-size: 0.85rem;
-            transition: opacity 0.2s;
-        }
-        .social-links a:hover {
-            opacity: 0.7;
-            text-decoration: underline;
-        }
-        
-        /* --- RESPONSIVE STYLES --- */
-        @media (max-width: 1024px) {
-            .container { padding-left: 20px; padding-right: 20px; }
-        }
-
         @media (max-width: 768px) {
-            /* Hamburger Menu & Mobile Navigation */
-            #hamburger-btn { display: block; }
+            body { background-image: none; }
+            .container { padding: 0 16px; }
+            .main-header h1 { font-size: 1.5rem; }
+            .gcp-logo { height: 36px; }
+            .logo img { height: 55px; }
             nav {
-                flex-direction: column; justify-content: center; gap: 2rem;
-                position: fixed; top: 0; right: 0; width: 75%; max-width: 300px;
-                height: 100vh; background: #fff; z-index: 1000;
-                transform: translateX(100%); transition: transform 0.3s ease-in-out;
-                display: flex;
+                display: none; position: fixed; top: 0; right: 0; width: 280px; height: 100vh;
+                background: #fff; flex-direction: column; padding: 20px;
+                box-shadow: -2px 0 10px rgba(0,0,0,0.1); align-items: flex-start; gap: 1rem;
             }
-            nav.is-active { transform: translateX(0); }
-            nav a { font-size: 1.25rem; padding: 10px; }
+            nav.is-active { display: flex; }
+            #hamburger-btn {
+                display: block; background: transparent; border: none; cursor: pointer;
+                z-index: 1001; padding: 5px;
+            }
+            .overlay {
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background-color: rgba(0, 0, 0, 0.4); z-index: 99;
+                opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s;
+            }
+            .overlay.is-active { opacity: 1; visibility: visible; }
+            #refresh-btn span { display: none; }
+            #refresh-btn { padding: 10px; }
             
-            /* --- NEW: Header and Title Section Refinements --- */
-            header .logo img {
-                width: 250px; /* Slightly smaller GDG logo */
-                height: auto;
+            .podium-section {
+                padding: 16px 0;
+                gap: 2%;
             }
-            .main-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                gap: 15px;
-            }
-            .main-header .title-section h1 {
-                font-size: 1.2rem; /* Reduced font size to fit in one line */
-            }
-            #refresh-btn {
-                padding: 8px; /* Make the button a neat square */
-            }
-            #refresh-btn span {
-                display: none; /* Hide the "Refresh" text */
-            }
+            .podium-place { width: 32%; }
+            .podium-avatar { width: 60px; height: 60px; font-size: 1.5rem; border-width: 2px; }
+            .podium-place.first .podium-avatar { width: 72px; height: 72px; font-size: 2rem; }
+            .podium-name { font-size: 0.8rem; margin-top: 8px; }
+            .podium-badges { font-size: 0.7rem; }
+            .podium-stand { font-size: 1.5rem; padding-top: 5px; }
+            .podium-place.second .podium-stand { height: 70px; border-radius: 8px 8px 0 0; }
+            .podium-place.first .podium-stand { height: 100px; border-radius: 10px 10px 0 0; }
+            .podium-place.third .podium-stand { height: 50px; border-radius: 8px 8px 0 0; }
+
 
             .controls-bar { flex-direction: column; align-items: stretch; gap: 15px; }
-
+            .search-container { max-width: 100%; }
             #progress-table thead { display: none; }
             #progress-table tr {
-                display: block; margin-bottom: 20px; border: 1px solid #e0e0e0;
-                border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                display: block; margin-bottom: 16px; border-radius: 12px;
+                background: #fff; border: none; 
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05); overflow: hidden;
+            }
+             #progress-table tr.top-20-highlight {
+                border-left: 4px solid var(--google-blue);
             }
             #progress-table td {
                 display: flex; justify-content: space-between; align-items: center;
-                padding: 14px 15px; text-align: right; border-bottom: 1px solid #f0f0f0;
+                padding: 12px 16px; text-align: right; border-bottom: 1px solid #f0f0f0;
                 white-space: normal;
             }
             #progress-table tr td:last-child { border-bottom: none; }
             #progress-table td::before {
                 content: attr(data-label); font-weight: 500; text-align: left;
-                padding-right: 15px; color: #5f6368;
+                padding-right: 16px; color: var(--secondary-text);
             }
             #progress-table .participant-name {
-                justify-content: flex-start; font-size: 1rem;
-                background-color: #f8f9fa; border-top-left-radius: 8px;
-                border-top-right-radius: 8px; font-weight: 500;
+                justify-content: flex-start; font-size: 1.1rem;
+                background-color: #f8f9fa; padding: 16px;
             }
             #progress-table .participant-name::before { display: none; }
-            
-            #progress-table .status-cell {
-                display: none;
-            }
-            #progress-table .progress-bar-container {
-                display: none;
-            }
+            #progress-table .status-cell, #progress-table .progress-bar-container { display: none; }
             #progress-table .count-chip {
-                background-color: transparent;
-                color: #202124;
-                font-weight: 500;
-                font-size: 0.9rem;
-                padding: 0;
+                background-color: transparent; color: var(--primary-text);
+                font-weight: 500; font-size: 1rem; padding: 0;
             }
         }
     </style>
 </head>
 <body>
     <div class="overlay"></div>
-    <div class="container">
-        <header>
-            <div class="logo">
-                <img src="{{url_for('static',filename='logo.png')}}" alt="Google Developer Group">
-            </div>
+    <header class="site-header">
+        <div class="container header-content">
+            <a href="/dashboard" class="logo">
+                <img src="/static/logo.png" alt="Google Developer Groups Logo">
+            </a>
             <nav>
                 <a href="/dashboard">Dashboard</a>
                 <a href="/" class="active">Progress</a>
-                <a href="#">About</a>
             </nav>
             <button id="hamburger-btn" aria-label="Toggle menu" aria-expanded="false">
                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
-        </header>
+        </div>
+    </header>
 
+    <div class="container">
         <main>
             <div class="main-header">
                 <div class="title-section">
@@ -262,65 +351,45 @@
                         <p>GDGoC NEHU Progress Leaderboard</p>
                     </div>
                 </div>
-                  <button id="refresh-btn">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                      <span>Refresh</span>
-                  </button>
+                <button id="refresh-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                    <span>Refresh Data</span>
+                </button>
             </div>
             
             <div id="loader-container">
                 <div class="loader"></div>
             </div>
 
+            <section class="podium-section">
+                <!-- Podium will be dynamically generated here -->
+            </section>
+
             <div class="controls-bar">
                 <div class="search-container">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" id="search-input" placeholder="Search by Name...">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="search-input" placeholder="Search by participant name...">
                 </div>
                 <button id="export-csv">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                    Export to CSV
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <span>Export to CSV</span>
                 </button>
             </div>
 
-            <div class="table-container">
-                <table id="progress-table">
-                    <thead></thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </main>
-        <footer>
-            <div class="footer-content">
-                <p>Developed with ❤️ by</p>
-                <div class="developer-profiles">
-                    <div class="profile">
-                        <p class="profile-name">Soumojit Bhuin</p>
-                        <div class="social-links">
-                            <a href="https://github.com/SoumojitBhuin" target="_blank" rel="noopener noreferrer">GitHub</a>
-                            <a href="https://www.linkedin.com/in/soumojit-bhuin-313328345/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-                        </div>
-                    </div>
-                    <div class="profile">
-                        <p class="profile-name">Rohit K. Shaw</p>
-                        <div class="social-links">
-                            <a href="https://github.com/shawrhit" target="_blank" rel="noopener noreferrer">GitHub</a>
-                            <a href="https://www.linkedin.com/in/shawrhit" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-                        </div>
-                    </div>
+            <div class="table-wrapper">
+                <div class="table-container">
+                    <table id="progress-table">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
-        </footer>
-    </div>
+        </main>
     </div>
 
-    <div id="ranker-modal" class="modal-overlay">
-        <div class="modal-content">
-            <span id="modal-close-btn" class="modal-close">&times;</span>
-            <div id="modal-body">
-            </div>
-        </div>
-    </div>
+    <footer>
+         <p>Developed with ❤️ by Soumojit Bhuin & Rohit K. Shaw</p>
+    </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -328,13 +397,10 @@
             const searchInput = document.getElementById('search-input');
             const exportBtn = document.getElementById('export-csv');
             const loaderContainer = document.getElementById('loader-container');
-            const mainContent = document.querySelectorAll('.controls-bar, .table-container');
+            const podiumSection = document.querySelector('.podium-section');
+            const mainContent = document.querySelectorAll('.controls-bar, .table-wrapper');
             let tableData = [];
             const colors = ['#4285F4', '#DB4437', '#F4B400', '#0F9D58', '#46BDC6', '#AB47BC'];
-            
-            const modalOverlay = document.getElementById('ranker-modal');
-            const modalCloseBtn = document.getElementById('modal-close-btn');
-            const modalBody = document.getElementById('modal-body');
             
             const hamburgerBtn = document.getElementById('hamburger-btn');
             const mainNav = document.querySelector('nav');
@@ -347,37 +413,73 @@
                 document.body.style.overflow = isActive ? 'hidden' : '';
 
                 if (isActive) {
-                    hamburgerBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
+                    hamburgerBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;
                 } else {
-                    hamburgerBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`;
+                    hamburgerBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>`;
                 }
             };
             
             async function fetchData() {
                 loaderContainer.style.display = 'flex';
+                podiumSection.style.display = 'none';
                 mainContent.forEach(el => el.style.display = 'none');
                 try {
                     const response = await fetch('/api/progress-data');
                     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                     const data = await response.json();
                     tableData = data;
+                    renderPodium(data.participants);
                     renderTable(data);
                 } catch (error) {
                     console.error('Error fetching data:', error);
                 } finally {
                     loaderContainer.style.display = 'none';
+                    podiumSection.style.display = 'flex';
                     document.querySelector('.controls-bar').style.display = 'flex';
-                    document.querySelector('.table-container').style.display = 'block';
+                    document.querySelector('.table-wrapper').style.display = 'block';
                 }
             }
             
-            function getRankDisplay(rank) {
-                switch (rank) {
-                    case 1: return '🥇';
-                    case 2: return '🥈';
-                    case 3: return '🥉';
-                    default: return rank;
-                }
+            function renderPodium(participants) {
+                podiumSection.innerHTML = '';
+                if (participants.length === 0) {
+                    podiumSection.style.display = 'none';
+                    return;
+                };
+
+                const findByRank = (rank) => participants.find(p => p.rank === rank);
+                
+                const podiumData = {
+                    first: findByRank(1),
+                    second: findByRank(2),
+                    third: findByRank(3)
+                };
+
+                const createPlace = (place, participant) => {
+                    if (!participant) return '';
+                    const rankText = {first: '1', second: '2', third: '3'};
+                    const colorIndex = participants.findIndex(p => p.email === participant.email);
+                    const avatarColor = colors[colorIndex % colors.length];
+
+                    return `
+                        <div class="podium-place ${place}">
+                            <div class="podium-details">
+                                <div class="podium-avatar" style="background-color: ${avatarColor};">${participant.initials}</div>
+                                <p class="podium-name">${participant.name}</p>
+                                <p class="podium-badges">${participant.badge_count} Badges</p>
+                            </div>
+                            <div class="podium-stand">${rankText[place]}</div>
+                        </div>
+                    `;
+                };
+                
+                const podiumOrder = [
+                    createPlace('second', podiumData.second),
+                    createPlace('first', podiumData.first),
+                    createPlace('third', podiumData.third)
+                ].join('');
+
+                podiumSection.innerHTML = podiumOrder;
             }
 
             function renderTable(data) {
@@ -388,32 +490,42 @@
                 thead.innerHTML = '';
                 tbody.innerHTML = '';
 
-                let headerRow = '<tr><th class="rank-cell">Name</th><th>Rank</th><th>Badge Count</th>';
-                labs.forEach(lab => headerRow += `<th>${lab}</th>`);
+                let headerRow = '<tr><th>Participant</th><th class="rank-cell" style="text-align:center;">Rank</th><th>Badge Progress</th>';
+                labs.forEach(lab => headerRow += `<th style="text-align: center; white-space: normal; min-width: 150px;">${lab}</th>`);
                 headerRow += '</tr>';
                 thead.innerHTML = headerRow;
 
-                const check_mark = `<div class="check-mark-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
+                const check_mark = `<div class="check-mark-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>`;
                 
-                participants.forEach((p, index) => {
-                    const color = colors[index % colors.length];
-                    const rankDisplay = getRankDisplay(p.rank);
-                    const isTopRanker = p.rank <= 3 ? 'top-ranker' : '';
+                const tableParticipants = participants.filter(p => p.rank > 3);
 
-                    let row = `<tr data-name="${p.name.toLowerCase()}" class="${isTopRanker}" data-participant='${JSON.stringify(p)}'>
-                                        <td class="participant-name" data-label="Name">
-                                            <div class="avatar" style="background-color: ${color};">${p.initials}</div>
-                                            ${p.name}
-                                        </td>
-                                        <td class="rank-cell" data-label="Rank">${rankDisplay}</td>
-                                        <td class="badge-count" data-label="Badge Count">
-                                            <div>
-                                                <div class="count-chip">${p.badge_count} / ${labs.length}</div>
-                                                <div class="progress-bar-container">
-                                                    <div class="progress-bar" style="width: ${p.completion_percentage}%;"></div>
-                                                </div>
-                                            </div>
-                                        </td>`;
+                tableParticipants.forEach((p, index) => {
+                    const colorIndex = participants.findIndex(participant => participant.email === p.email);
+                    const color = colors[colorIndex % colors.length];
+                    
+                    let rowClasses = [];
+                    if (p.rank > 3 && p.rank <= 20) rowClasses.push('top-20-highlight');
+
+                    let rankContent = p.rank;
+                    if (p.rank > 3 && p.rank <= 20) {
+                        rankContent = `<span class="rank-indicator">★</span> ${p.rank}`;
+                    }
+
+
+                    let row = `<tr data-name="${p.name.toLowerCase()}" class="${rowClasses.join(' ')}" data-participant='${JSON.stringify(p)}'>
+                        <td class="participant-name" data-label="Name">
+                            <div class="avatar" style="background-color: ${color};">${p.initials}</div>
+                            ${p.name}
+                        </td>
+                        <td class="rank-cell" data-label="Rank">${rankContent}</td>
+                        <td class="badge-count" data-label="Badge Progress">
+                            <div>
+                                <div class="count-chip">${p.badge_count} / ${labs.length} Badges</div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar" style="width: ${p.completion_percentage}%;"></div>
+                                </div>
+                            </div>
+                        </td>`;
                     
                     labs.forEach(lab => {
                         const completed = p.name_of_completed_labs.includes(lab);
@@ -425,28 +537,8 @@
                 });
             }
             
-            function showModal(participant) {
-                const rankIcon = getRankDisplay(participant.rank);
-                let rankText;
-                switch (participant.rank) {
-                    case 1: rankText = "1st Place"; break;
-                    case 2: rankText = "2nd Place"; break;
-                    case 3: rankText = "3rd Place"; break;
-                    default: rankText = `${participant.rank}th Place`; break;
-                }
-                
-                modalBody.innerHTML = `
-                    <div class="rank-icon">${rankIcon}</div>
-                    <h2>Congratulations, ${participant.name}!</h2>
-                    <p>You've achieved <strong>${rankText}</strong> on the leaderboard!</p>
-                    <p>You have completed <strong>${participant.badge_count} badges</strong> with ${participant.completion_percentage}% completion.</p>
-                    <p>Keep up the fantastic work! 🚀</p>
-                `;
-                modalOverlay.style.display = 'flex';
-            }
-
             function filterTable() {
-                const filter = searchInput.value.toLowerCase();
+                 const filter = searchInput.value.toLowerCase();
                 const rows = document.querySelectorAll('#progress-table tbody tr');
                 rows.forEach(row => {
                     const name = row.dataset.name;
@@ -457,7 +549,6 @@
             function exportToCsv() {
                 if (!tableData || !tableData.labs || !tableData.participants) {
                     console.error("No data available to export.");
-                    alert("Please wait for the data to load before exporting.");
                     return;
                 }
                 const { labs, participants } = tableData;
@@ -473,34 +564,21 @@
                 });
                 const link = document.createElement("a");
                 link.setAttribute("href", encodeURI(csvContent));
-                link.setAttribute("download", "progress_export.csv");
+                link.setAttribute("download", "gcsj_progress_export.csv");
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
             }
 
-            // Event Listeners
             hamburgerBtn.addEventListener('click', toggleMenu);
             overlay.addEventListener('click', toggleMenu);
             refreshBtn.addEventListener('click', fetchData);
             searchInput.addEventListener('keyup', filterTable);
             exportBtn.addEventListener('click', exportToCsv);
             
-            document.querySelector('#progress-table tbody').addEventListener('click', (event) => {
-                const row = event.target.closest('tr.top-ranker');
-                if (row) {
-                    const participantData = JSON.parse(row.dataset.participant);
-                    showModal(participantData);
-                }
-            });
-
-            modalCloseBtn.addEventListener('click', () => { modalOverlay.style.display = 'none'; });
-            modalOverlay.addEventListener('click', (event) => {
-                if (event.target === modalOverlay) { modalOverlay.style.display = 'none'; }
-            });
-            
             fetchData();
         });
     </script>
 </body>
 </html>
+
