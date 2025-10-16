@@ -376,8 +376,8 @@
                 <a href="/">Progress</a>
             </nav>
             <button id="hamburger-btn" aria-label="Toggle menu" aria-expanded="false">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-           </button>
+                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
         </div>
     </header>
 
@@ -582,7 +582,6 @@
                 const labels = popularityData.map(item => item[0].replace(/Get Started with|Develop with|App Building with/g, '').trim());
                 const values = popularityData.map(item => item[1]);
                 const backgroundColors = ['#4285F4', '#EA4335', '#FBBC05', '#34A853', '#AB47BC', '#00ACC1'].map(c => c + 'CC');
-                const borderColors = ['#4285F4', '#EA4335', '#FBBC05', '#34A853', '#AB47BC', '#00ACC1'];
 
                 if (popularityChart) popularityChart.destroy();
                 popularityChart = new Chart(ctx, {
@@ -596,15 +595,26 @@
                             borderWidth: 2,
                         }] 
                     },
+                    // THIS IS THE CORRECTED SECTION
                     options: {
-                        ...chartDefaultOptions,
+                        responsive: true,
+                        maintainAspectRatio: false,
                         cutout: '70%',
                         animation: isRefresh ? false : {
-                             duration: 1000,
-                             easing: 'easeOutCubic'
+                              duration: 1000,
+                              easing: 'easeOutCubic'
                         },
                         plugins: {
-                            ...chartDefaultOptions.plugins,
+                            tooltip: {
+                                backgroundColor: '#fff',
+                                titleColor: '#202124',
+                                bodyColor: '#5f6368',
+                                borderColor: '#ddd',
+                                borderWidth: 1,
+                                padding: 10,
+                                titleFont: { family: 'Google Sans', weight: '500' },
+                                bodyFont: { family: 'Roboto' }
+                            },
                             legend: {
                                 display: true,
                                 position: 'right',
@@ -613,7 +623,7 @@
                                     boxWidth: 20
                                 }
                             }
-                        },
+                        }
                     }
                 });
             }
@@ -626,3 +636,4 @@
     </script>
 </body>
 </html>
+
