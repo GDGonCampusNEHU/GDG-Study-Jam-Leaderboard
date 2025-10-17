@@ -148,7 +148,7 @@
             padding-top: 10px;
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
         }
-        .podium-place.second .podium-stand { height: 120px; border-radius: 12px 12px 0 0; background-color: #E8EAED; color: #B0B0B0;}
+        .podium-place.second .podium-stand { height: 120px; border-radius: 12px 12px 0 0; background-color: #d6d6d6; color: #797676;}
         .podium-place.first .podium-stand { height: 180px; border-radius: 16px 16px 0 0; background-color: var(--google-yellow); color: white; }
         .podium-place.third .podium-stand { height: 90px; border-radius: 12px 12px 0 0; background-color: #D2A679; color: white;}
 
@@ -177,31 +177,67 @@
         }
         #export-csv:hover { background-color: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .table-wrapper {
-            background: rgba(255, 255, 255, 0.6);
+            background: rgb(255, 255, 255);
             backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.3);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             overflow: hidden;
         }
-        .table-container { overflow-x: auto; }
+        .table-container { 
+            overflow-x: scroll; /* Makes horizontal scrollbar always visible */
+            overflow-y: auto;  /* Adds vertical scrollbar when needed */
+            max-height: 60vh;  /* Sets a max height to enable vertical scroll */
+        }
+        /* --- Custom Scrollbar Styling --- */
+        .table-container::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 8px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+            transition: background-color 0.3s ease;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.4);
+        }
+
         #progress-table {
             width: 100%; border-collapse: collapse;
             font-size: 0.9rem; text-align: left; white-space: nowrap;
         }
         #progress-table th, #progress-table td {
-            padding: 16px; border-bottom: 1px solid rgba(0,0,0,0.08);
+            padding: 16px;
             vertical-align: middle;
         }
         #progress-table thead {
-            background-color: rgba(240, 242, 245, 0.5);
-            position: sticky; top: 0; z-index: 10;
+            background-color: rgba(255, 255, 255);
+            position: sticky; 
+            top: 0; 
+            z-index: 10;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
         }
-        #progress-table th { color: var(--secondary-text); font-weight: 500; font-family: var(--font-family-header); }
+        #progress-table tbody tr {
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+        }
+    
+        #progress-table th { color: var(--secondary-text); 
+            font-weight: 500; 
+            font-family: var(--font-family-header); 
+        }
         #progress-table tbody tr:hover { background-color: rgba(66, 133, 244, 0.05); }
         
         #progress-table tbody tr.top-20-highlight {
-            background-color: #e8f0fe;
-            border-left: 4px solid var(--google-blue);
+            background-color:  #26f6fd3f;
         }
         #progress-table tbody tr.top-20-highlight:hover {
             background-color: #dce9fd;
@@ -212,7 +248,9 @@
             margin-right: 4px;
         }
 
-        tbody tr:last-child td { border-bottom: none; }
+        #progress-table tbody tr:last-child {
+            border-bottom: none;
+        }
         #progress-table .rank-cell {
             font-weight: 500; 
             font-size: 1.1rem; 
